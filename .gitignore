@@ -1,0 +1,9 @@
+build/
+managed_components/
+sdkconfig
+sdkconfig.old
+dependencies.lock
+console.log
+example/paa_cert/*.der
+tmp/
+__pycache__/

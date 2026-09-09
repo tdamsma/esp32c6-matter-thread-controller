@@ -1,0 +1,41 @@
+# Custom partition table: one factory app plus a SPIFFS partition for PAA roots.
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_FILENAME="partitions.csv"
+
+# BLE is how commissioning starts; it stays enabled afterwards.
+CONFIG_BT_ENABLED=y
+CONFIG_BT_NIMBLE_ENABLED=y
+
+# Controller + commissioner, no Matter server role.
+CONFIG_ENABLE_CHIP_CONTROLLER_BUILD=y
+CONFIG_ESP_MATTER_CONTROLLER_ENABLE=y
+CONFIG_ESP_MATTER_COMMISSIONER_ENABLE=y
+CONFIG_ESP_MATTER_ENABLE_MATTER_SERVER=n
+CONFIG_CHIP_PROJECT_CONFIG="main/matter_project_config.h"
+
+# Interactive shell: the pairing and read/subscribe commands live here.
+CONFIG_ENABLE_CHIP_SHELL=y
+CONFIG_ESP_MATTER_CONSOLE_TASK_STACK=4096
+CONFIG_CHIP_SHELL_CMD_LINE_BUF_MAX_LENGTH=512
+
+# Commissioning a retail device requires its manufacturer's production PAA root.
+# Put the .der files in paa_cert/ (see paa_cert/README.md).
+CONFIG_SPIFFS_ATTESTATION_TRUST_STORE=y
+CONFIG_SPIFFS_ATTESTATION_TRUST_STORE_PARTITION_LABEL="paa_cert"
+
+# Platform DNS-SD, so OpenThread SRP/DNS is used to resolve sleepy devices.
+# Minimal mDNS cannot resolve a Thread-only node without a border router.
+CONFIG_USE_MINIMAL_MDNS=n
+
+CONFIG_LWIP_HOOK_IP6_ROUTE_DEFAULT=y
+CONFIG_LWIP_HOOK_ND6_GET_GW_DEFAULT=y
+CONFIG_LWIP_IPV6_AUTOCONFIG=y
+CONFIG_LWIP_IPV6_NUM_ADDRESSES=6
+
+CONFIG_CHIP_TASK_STACK_SIZE=15360
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=10240
+CONFIG_NUM_UDP_ENDPOINTS=16
+CONFIG_MBEDTLS_HKDF_C=y
+
+# This node is not commissioned by anyone, so it needs no Wi-Fi driver.
+CONFIG_WIFI_NETWORK_COMMISSIONING_DRIVER=n
