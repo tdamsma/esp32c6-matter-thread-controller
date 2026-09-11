@@ -152,6 +152,15 @@ endpoints.
 The initial value of 22 came from a turn endpoint. The click endpoints
 advertised `MomentarySwitchLongPress` in these measurements.
 
+This split is corroborated on independent hardware. A Home Assistant
+diagnostics dump of another BILRESA scroll wheel (firmware 1.8.7, spec
+0x01030000), filed on
+[home-assistant/core#159035](https://github.com/home-assistant/core/issues/159035),
+reports the same FeatureMap 22 with `MultiPressMax` 18 on the six rotation
+endpoints and FeatureMap 30 with `MultiPressMax` 3 on endpoints 3, 6 and 9.
+Two units, same values, so this is a device property rather than a quirk of
+the one remote measured here.
+
 The first run gave three holds on endpoints 3 and 9, measured from the device's
 own timestamps:
 
@@ -219,6 +228,14 @@ before being used.
   [../example/paa_cert/README.md](../example/paa_cert/README.md).
 - `FeatureMap` is attribute `0xFFFC`. `0xFFFD` is `ClusterRevision`. Reading the
   wrong one returns a plausible small integer rather than an error.
+- IKEA's Matter firmware has other gaps between what is declared and what is
+  emitted. [connectedhomeip#73262](https://github.com/project-chip/connectedhomeip/issues/73262)
+  (open) reports that a certified MYGGBETT contact sensor updates its
+  `BooleanState` attribute but never emits the mandatory `StateChange` event,
+  and cross-references a similar concern about this encoder. Which events a
+  device actually sends is worth verifying on hardware rather than inferring
+  from a FeatureMap or from certification, which is the same lesson this
+  experiment's own wrong premise produced.
 
 The device's own reference,
 [ikea-bilresa-e2490](https://github.com/tdamsma/ikea-bilresa-e2490), carries

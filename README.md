@@ -8,9 +8,20 @@ without a border router, hub, PSRAM or Wi-Fi.
 This project adapts Espressif's controller example, which ships S3 sdkconfigs
 and defaults to an 8 MB flash with a dual-OTA layout, to a 4 MB ESP32-C6.
 
-The controller was tested on an M5Stack NanoC6 with an IKEA BILRESA remote.
+The controller was tested on an M5Stack NanoC6 with an IKEA BILRESA **scroll
+wheel** remote (E2490, Matter product id 0x8000). IKEA also sells a dual-button
+BILRESA (E2489, 0x8001) with a much simpler two-endpoint topology, so the
+endpoint layout and timings documented here are specific to the scroll wheel.
 Device measurements are documented in
 [ikea-bilresa-e2490](https://github.com/tdamsma/ikea-bilresa-e2490).
+
+One reason to drive a device like this directly rather than through a hub:
+Home Assistant's Matter integration currently caps multipress reporting at
+`multi_press_1` through `multi_press_8` and suppresses `MultiPressOngoing`,
+even though this remote advertises a `MultiPressMax` of 18
+([home-assistant/core#159035](https://github.com/home-assistant/core/issues/159035)).
+Two fix attempts closed unmerged and the replacement is still in flight. A
+controller subscribed to the device sees the full range today.
 
 This document was drafted with Claude and OpenAI models. Hardware measurements
 and experiment results are documented below and in the linked experiment notes.
@@ -165,7 +176,13 @@ After the controller reboots, its SRP registry is empty until the
 device re-registers, so the first attempt to reach a known device can fail with
 `operational discovery failed: 32` (timeout). The example retries every 30 s.
 
-### 3. Native Thread radio configuration
+### 3. Native Thread radio configuration, and why Thread only
+
+The ESP32-C6 has a single RF path shared between Wi-Fi and 802.15.4, so it
+cannot receive on both at once, and Espressif has no dynamic multiprotocol
+support planned ([esp-matter#1790](https://github.com/espressif/esp-matter/discussions/1790)).
+Running Thread only is therefore not just a footprint decision.
+
 
 `esp_openthread_platform_config_t` is only set in the example's border-router
 path. A plain Thread build starts with no radio configuration and panics. Set
